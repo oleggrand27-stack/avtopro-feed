@@ -4,10 +4,15 @@ import datetime
 import os
 import sys
 
+import fetch_feed
 import fetch_prom
 import split_by_group
 
-fetch_prom.main("prom_api.xlsx")
+# Основне джерело - YML-фід Прому; API-токен - запасний варіант
+if os.environ.get("PROM_FEED_URL"):
+    fetch_feed.main("prom_api.xlsx")
+else:
+    fetch_prom.main("prom_api.xlsx")
 split_by_group.main("prom_api.xlsx", "site")
 files = sorted(f for f in os.listdir("site") if f.endswith(".xlsx"))
 if not files:

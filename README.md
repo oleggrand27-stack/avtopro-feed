@@ -2,7 +2,8 @@
 
 Автоматичне оновлення складів на Автопро з Prom.ua.
 
-Кілька разів на день GitHub Actions бере товари з API Прому (секрет `PROM_TOKEN`,
+Кілька разів на день GitHub Actions бере товари з YML-фіду Прому (секрет `PROM_FEED_URL`;
+запасний варіант - API, секрет `PROM_TOKEN`,
 токен тільки на читання товарів), робить окремий файл на кожен склад і публікує їх
 на GitHub Pages: `https://oleggrand27-stack.github.io/avtopro-feed/<склад>.xlsx`.
 
