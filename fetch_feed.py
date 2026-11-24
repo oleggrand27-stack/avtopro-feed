@@ -10,6 +10,7 @@ import json
 import os
 import sys
 import time
+from collections import Counter
 import urllib.request
 import xml.etree.ElementTree as ET
 
@@ -66,6 +67,15 @@ def main(dst):
     ws = wb.active
     ws.title = "Export Products Sheet"
     ws.append(header)
+    # Назви груп у фіді можуть відрізнятися від назв в експорті (напр. обидві Fabia 2
+    # мають одну назву). Тому категорію фіду переводимо в групу експорту за товарами,
+    # які є в обох; нові товари отримують групу своєї категорії.
+    votes = {}
+    for o in offers:
+        g = base.get(str(o.get("id")), {}).get("_group")
+        if g:
+            votes.setdefault(text(o, "categoryId") or "", Counter())[g] += 1
+    cat_group = {c: v.most_common(1)[0][0] for c, v in votes.items()}
     no_group = 0
     for o in offers:
         pid = o.get("id")
@@ -82,7 +92,8 @@ def main(dst):
         except ValueError:
             qty = None
         in_stock = avail == "true" and qty != 0
-        group = groups.get(text(o, "categoryId") or "") or known.get("_group")
+        cid = text(o, "categoryId") or ""
+        group = known.get("_group") or cat_group.get(cid) or groups.get(cid)
         if not group:
             no_group += 1
         pics = [p.text.strip() for p in o.findall("picture") if p.text and p.text.strip()]
